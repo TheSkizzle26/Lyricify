@@ -6,11 +6,13 @@ from line import Line
 
 class Lyrics:
     def __init__(self, path: str = None):
+        self.font = pr.load_font("jetbrains_mono.ttf")
+
         self.lines: list[Line] = []
         self.current_line = 0
         self.start_time = pr.get_time()
 
-        self.font = pr.load_font("jetbrains_mono.ttf")
+        self.num_shown_lines = 5
 
         if path:
             with open(path, "r") as file:
@@ -58,7 +60,7 @@ class Lyrics:
                 self.current_line += 1
 
     def render(self, screen_size: tuple[int, int]):
-        for i in range(-5, 5):
+        for i in range(-self.num_shown_lines, self.num_shown_lines):
             if not (0 <= self.current_line+i < len(self.lines)):
                 continue
 
@@ -73,7 +75,7 @@ class Lyrics:
                     pr.ORANGE
                 )
 
-            brightness = 1 - (abs(i) / 5)
+            brightness = 1 - (abs(i) / self.num_shown_lines)
 
             pr.draw_text_ex(
                 self.font,
