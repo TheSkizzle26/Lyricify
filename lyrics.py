@@ -60,6 +60,8 @@ class Lyrics:
                 self.current_line += 1
 
     def render(self, screen_size: tuple[int, int]):
+        now = pr.get_time()
+
         for i in range(-self.num_shown_lines, self.num_shown_lines):
             if not (0 <= self.current_line+i < len(self.lines)):
                 continue
@@ -73,6 +75,18 @@ class Lyrics:
                     0, y,
                     screen_size[0], 32,
                     pr.ORANGE
+                )
+
+                passed_time = (now - self.start_time) - line.time
+                t = passed_time / (self.lines[self.current_line+1].time - self.lines[self.current_line].time)
+                x = t * len(line.text) * 16
+
+                pr.draw_rectangle(
+                    int(x - 5),
+                    int(y),
+                    10,
+                    32,
+                    pr.REDy
                 )
 
             brightness = 1 - (abs(i) / self.num_shown_lines)
