@@ -86,7 +86,7 @@ class Lyrics:
                     int(y),
                     10,
                     32,
-                    pr.REDy
+                    pr.RED
                 )
 
             brightness = 1 - (abs(i) / self.num_shown_lines)
