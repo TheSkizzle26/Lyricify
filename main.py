@@ -9,6 +9,7 @@ class Main:
         self.width, self.height = 800, 600
         pr.init_window(self.width, self.height, "Lyricify")
         pr.set_window_monitor(0)
+        pr.set_target_fps(180)
 
         self.lyrics = Lyrics("test_data")
 
@@ -37,6 +38,8 @@ class Main:
         while True:
             self.update()
             self.render()
+
+            pr.set_window_title(f"FPS: {pr.get_fps()}")
 
 
 if __name__ == '__main__':
