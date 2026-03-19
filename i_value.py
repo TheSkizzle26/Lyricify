@@ -20,7 +20,9 @@ class InterpolatedValue:
 
         return self.start + self.func(t)*(self.end - self.start)
 
-    def set(self, value: float, start_at_current=False):
-        self.start = self.get() if start_at_current else self.end
+    def set(self, value: float, instant=False, start_at_current=False):
+        if instant: self.start = value
+        elif start_at_current: self.start = self.get()
+        else: self.start = self.end
         self.end = value
         self.start_time = pr.get_time()

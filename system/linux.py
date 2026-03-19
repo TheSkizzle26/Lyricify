@@ -47,6 +47,9 @@ class SystemLinux(System):
         if artists: self.song_artists = artists.value
         if length: self.song_length = length.value / 1_000_000
 
+        if not (title and artists and length):
+            print("Couldn't load data.")
+
         position = await props.call_get("org.mpris.MediaPlayer2.Player", "Position")
         self.song_position = position.value / 1_000_000
 

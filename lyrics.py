@@ -18,8 +18,8 @@ class Lyrics:
         )
 
         self.anchor_pos = (
-            800 // 10,
-            600 // 2
+            1920 // 10,
+            1080 // 2
         )
 
         self.lines: list[Line] = []
@@ -41,11 +41,15 @@ class Lyrics:
 
         line_idx = 0
         for i, line in enumerate(self.lines):
-            if line.time < song_pos:
+            if line.time > song_pos:
                 line_idx = i-1
                 break
 
-        self.set_current_line(line_idx, False)
+        if line_idx < 0:
+            line_idx = 0
+
+        if line_idx != self.current_line:
+            self.set_current_line(line_idx)
 
     def load_metadata(self, data_type: str, value: Any):
         print(data_type, value)
@@ -81,9 +85,9 @@ class Lyrics:
             except Exception:
                 raise BaseException(f"Couldn't load line: \"{line}\"")
 
-    def set_current_line(self, value: int, start_at_current=True):
+    def set_current_line(self, value: int, instant=False, start_at_current=True):
         self.current_line = value
-        self.scroll.set(value, start_at_current)
+        self.scroll.set(value, instant, start_at_current)
 
     def update(self):
         now = pr.get_time()
@@ -119,6 +123,66 @@ class Lyrics:
             min(max(color[2], 0), 255),
         )
 
+    def draw_current_line(self, x: int, y: int, now: float):
+        line = self.lines[self.current_line]
+
+        passed_time = (now - self.start_time) - line.time
+        total_duration = self.lines[min(self.current_line + 1, len(self.lines) - 1)].time - self.lines[self.current_line].time
+
+        t = passed_time / (total_duration if total_duration else passed_time)
+        t_idx = t * len(line.text)
+
+        char_x = 0
+        for char_idx in range(len(line.text)):
+            char = line.text[char_idx]
+
+            lerp = (t_idx - char_idx) * 0.5
+            lerp = self.clamp(lerp, 0, 1)
+            color = self.color_lerp(
+                self.after_color,
+                self.before_color,
+                lerp
+            )
+            color = self.color_clamp(color)
+
+            pr.draw_text_ex(
+                self.font,
+                char,
+                (x + char_x, y),
+                self.font_size,
+                0,
+                (
+                    color[0],
+                    color[1],
+                    color[2],
+                    255
+                )
+            )
+
+            char_x += self.get_str_width(char)
+
+    def draw_other_line(self, x: int, y: int, i: int):
+        line = self.lines[i]
+
+        alpha = 1 - (abs(i - self.scroll.get()) / self.num_shown_lines)
+        alpha = easings.ease_out_quart(alpha)
+        alpha = self.clamp(alpha, 0, 1)
+        color = self.before_color if (i - self.scroll.get()) < 0 else self.after_color
+
+        pr.draw_text_ex(
+            self.font,
+            line.text,
+            (x, y),
+            self.font_size,
+            0,
+            (
+                color[0],
+                color[1],
+                color[2],
+                int(alpha * 255)
+            )
+        )
+
     def render(self, screen_size: tuple[int, int]):
         now = pr.get_time()
 
@@ -126,7 +190,6 @@ class Lyrics:
             if not (0 <= i < len(self.lines)):
                 continue
 
-            line = self.lines[i]
             x = self.anchor_pos[0] + int(
                 math.pow(
                     abs(i - self.scroll.get()) / self.num_shown_lines,
@@ -140,57 +203,7 @@ class Lyrics:
 
             # current line
             if i == self.current_line:
-                passed_time = (now - self.start_time) - line.time
-                total_duration = self.lines[min(i+1, len(self.lines)-1)].time - self.lines[i].time
-
-                t = passed_time / (total_duration if total_duration else passed_time)
-                t_idx = t * len(line.text)
-
-                char_x = 0
-                for char_idx in range(len(line.text)):
-                    char = line.text[char_idx]
-
-                    lerp = (t_idx - char_idx) * 0.5
-                    lerp = self.clamp(lerp, 0, 1)
-                    color = self.color_lerp(
-                        self.after_color,
-                        self.before_color,
-                        lerp
-                    )
-                    color = self.color_clamp(color)
-
-                    pr.draw_text_ex(
-                        self.font,
-                        char,
-                        (x + char_x, y),
-                        self.font_size,
-                        0,
-                        (
-                            color[0],
-                            color[1],
-                            color[2],
-                            255
-                        )
-                    )
-
-                    char_x += self.get_str_width(char)
-
+                self.draw_current_line(x, y, now)
             # other line
             else:
-                alpha = 1 - (abs(i - self.scroll.get()) / self.num_shown_lines)
-                alpha = easings.ease_out_quart(alpha)
-                color = self.before_color if (i - self.scroll.get()) < 0 else self.after_color
-
-                pr.draw_text_ex(
-                    self.font,
-                    line.text,
-                    (x, y),
-                    self.font_size,
-                    0,
-                    (
-                        color[0],
-                        color[1],
-                        color[2],
-                        int(alpha * 255)
-                    )
-                )
+                self.draw_other_line(x, y, i)
