@@ -9,7 +9,7 @@ from line import Line
 
 class Lyrics:
     def __init__(self, path: str = None):
-        self.font_size = 64
+        self.font_size = 48
         self.font = pr.load_font_ex(
             "jetbrains_mono.ttf",
             self.font_size,
