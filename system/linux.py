@@ -39,9 +39,13 @@ class SystemLinux(System):
 
         metadata = await props.call_get("org.mpris.MediaPlayer2.Player", "Metadata")
 
-        self.song_title = metadata.value.get("xesam:title", "Unknown").value
-        self.song_artists = metadata.value.get("xesam:artist", ["Unknown"]).value
-        self.song_length = metadata.value.get("mpris:length", 0).value / 1_000_000
+        title = metadata.value.get("xesam:title", None)
+        artists = metadata.value.get("xesam:artist", None)
+        length = metadata.value.get("mpris:length", None)
+
+        if title: self.song_title = title.value
+        if artists: self.song_artists = artists.value
+        if length: self.song_length = length.value / 1_000_000
 
         position = await props.call_get("org.mpris.MediaPlayer2.Player", "Position")
         self.song_position = position.value / 1_000_000
