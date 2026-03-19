@@ -1,0 +1,9 @@
+class System:
+    def is_song_playing(self) -> bool:
+        ...
+
+    def get_song_name(self) -> str:
+        ...
+
+    def get_song_pos(self) -> float:
+        ...

@@ -1,16 +1,21 @@
 import pyray as pr
 import sys
 
+import system
 from lyrics import Lyrics
 
 
 class Main:
     def __init__(self):
-        self.width, self.height = 800, 600
+        self.width, self.height = 1920, 1080
+        pr.set_config_flags(
+            pr.ConfigFlags.FLAG_FULLSCREEN_MODE
+        )
         pr.init_window(self.width, self.height, "Lyricify")
         pr.set_window_monitor(0)
-        pr.set_target_fps(180)
+        # pr.set_target_fps(180)
 
+        self.system = system.SystemLinux()
         self.lyrics = Lyrics("test_data")
 
     def update(self):
@@ -18,6 +23,9 @@ class Main:
             pr.close_window()
             sys.exit()
 
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_UP):
+            pos = self.system.get_song_pos()
+            self.lyrics.reset(pos)
         self.lyrics.update()
 
     def render(self):

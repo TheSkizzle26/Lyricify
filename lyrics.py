@@ -9,11 +9,22 @@ from line import Line
 
 class Lyrics:
     def __init__(self, path: str = None):
-        self.font = pr.load_font("jetbrains_mono.ttf")
+        self.font_size = 64
+        self.font = pr.load_font_ex(
+            "jetbrains_mono.ttf",
+            self.font_size,
+            None,
+            0
+        )
+
+        self.anchor_pos = (
+            800 // 10,
+            600 // 2
+        )
 
         self.lines: list[Line] = []
         self.current_line = 0
-        self.start_time = pr.get_time() - 30
+        self.start_time = pr.get_time()
 
         self.num_shown_lines = 5
         self.scroll = InterpolatedValue(0, 0.5)
@@ -26,6 +37,17 @@ class Lyrics:
         if path:
             with open(path, "r") as file:
                 self.load(file.read())
+
+    def reset(self, song_pos: float):
+        self.start_time = pr.get_time() - song_pos
+
+        line_idx = 0
+        for i, line in enumerate(self.lines):
+            if line.time > song_pos:
+                line_idx = i-1
+                break
+
+        self.set_current_line(line_idx, False)
 
     def load_metadata(self, data_type: str, value: Any):
         print(data_type, value)
@@ -61,9 +83,9 @@ class Lyrics:
             except Exception:
                 raise BaseException(f"Couldn't load line: \"{line}\"")
 
-    def set_current_line(self, value: int):
+    def set_current_line(self, value: int, start_at_current=True):
         self.current_line = value
-        self.scroll.set(value)
+        self.scroll.set(value, start_at_current)
 
     def update(self):
         now = pr.get_time()
@@ -71,6 +93,33 @@ class Lyrics:
         if self.current_line+1 < len(self.lines):
             if (now - self.start_time) > self.lines[self.current_line+1].time:
                 self.set_current_line(self.current_line+1)
+
+    def get_str_width(self, text: str):
+        return int(pr.measure_text_ex(
+            self.font,
+            text,
+            self.font_size,
+            0
+        ).x)
+
+    def clamp(self, x: float, a: float, b: float):
+        if x < a: return a
+        if x > b: return b
+        return x
+
+    def color_lerp(self, color_a: tuple[int, int, int], color_b: tuple[int, int, int], t: float):
+        return (
+            int(color_a[0] + t*(color_b[0] - color_a[0])),
+            int(color_a[1] + t*(color_b[1] - color_a[1])),
+            int(color_a[2] + t*(color_b[2] - color_a[2])),
+        )
+
+    def color_clamp(self, color: tuple[int, int, int]):
+        return (
+            min(max(color[0], 0), 255),
+            min(max(color[1], 0), 255),
+            min(max(color[2], 0), 255),
+        )
 
     def render(self, screen_size: tuple[int, int]):
         now = pr.get_time()
@@ -80,43 +129,70 @@ class Lyrics:
                 continue
 
             line = self.lines[i]
-            y = int(300 + (i - self.scroll.get()) * 32)
+            x = self.anchor_pos[0] + int(
+                math.pow(
+                    abs(i - self.scroll.get()) / self.num_shown_lines,
+                    4
+                ) * 50
+            )
+            y = self.anchor_pos[1] + int((i - self.scroll.get()) * self.font_size)
+
+            x = max(x, 0)
+            y = max(y, 0)
 
             # current line
             if i == self.current_line:
-                pr.draw_rectangle(
-                    0, y,
-                    screen_size[0], 32,
-                    pr.ORANGE
-                )
-
                 passed_time = (now - self.start_time) - line.time
                 total_duration = self.lines[min(i+1, len(self.lines)-1)].time - self.lines[i].time
+
                 t = passed_time / (total_duration if total_duration else passed_time)
-                x = t * len(line.text) * 16
+                t_idx = t * len(line.text)
 
-                pr.draw_rectangle(
-                    int(x - 5),
-                    int(y),
-                    10,
-                    32,
-                    pr.RED
+                char_x = 0
+                for char_idx in range(len(line.text)):
+                    char = line.text[char_idx]
+
+                    lerp = (t_idx - char_idx) * 0.5
+                    lerp = self.clamp(lerp, 0, 1)
+                    color = self.color_lerp(
+                        self.after_color,
+                        self.before_color,
+                        lerp
+                    )
+                    color = self.color_clamp(color)
+
+                    pr.draw_text_ex(
+                        self.font,
+                        char,
+                        (x + char_x, y),
+                        self.font_size,
+                        0,
+                        (
+                            color[0],
+                            color[1],
+                            color[2],
+                            255
+                        )
+                    )
+
+                    char_x += self.get_str_width(char)
+
+            # other line
+            else:
+                alpha = 1 - (abs(i - self.scroll.get()) / self.num_shown_lines)
+                alpha = easings.ease_out_quart(alpha)
+                color = self.before_color if (i - self.scroll.get()) < 0 else self.after_color
+
+                pr.draw_text_ex(
+                    self.font,
+                    line.text,
+                    (x, y),
+                    self.font_size,
+                    0,
+                    (
+                        color[0],
+                        color[1],
+                        color[2],
+                        int(alpha * 255)
+                    )
                 )
-
-            alpha = 1 - (abs(i - self.scroll.get()) / self.num_shown_lines)
-            alpha = easings.ease_out_quart(alpha)
-            color = self.before_color if (i - self.scroll.get()) < 0 else self.after_color
-
-            pr.draw_text_ex(
-                self.font,
-                line.text,
-                (0, y),
-                32,
-                0,
-                (
-                    color[0],
-                    color[1],
-                    color[2],
-                    int(alpha * 255)
-                )
-            )
