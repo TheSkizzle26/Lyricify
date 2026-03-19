@@ -25,7 +25,7 @@ class SystemLinux(System):
 
         players = [name for name in names if name.startswith("org.mpris.MediaPlayer2.") and not name.count("firefox")]
 
-        if players == 0:
+        if len(players) == 0:
             print("No players running!")
             self.is_playing = False
             return
