@@ -13,19 +13,31 @@ class Main:
         )
         pr.init_window(self.width, self.height, "Lyricify")
         pr.set_window_monitor(0)
-        # pr.set_target_fps(180)
+        pr.set_target_fps(144)
 
         self.system = system.SystemLinux()
         self.lyrics = Lyrics("test_data")
+
+        self.last_sync_time = -999
+
+    def sync(self):
+        pos = self.system.get_song_pos()
+        self.lyrics.reset(pos)
 
     def update(self):
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ESCAPE):
             pr.close_window()
             sys.exit()
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_UP):
-            pos = self.system.get_song_pos()
-            self.lyrics.reset(pos)
+        now = pr.get_time()
+
+        if now - self.last_sync_time > 1:
+            self.last_sync_time = now
+            self.sync()
+
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
+            self.sync()
+
         self.lyrics.update()
 
     def render(self):
