@@ -21,7 +21,11 @@ class Main:
 
     def render(self):
         pr.begin_drawing()
-        pr.clear_background(pr.BLACK)
+        pr.clear_background((
+            255,
+            90,
+            70
+        ))
 
         self.lyrics.render(
             (self.width, self.height)
