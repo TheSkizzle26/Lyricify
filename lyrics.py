@@ -186,7 +186,8 @@ class Lyrics:
     def render(self, screen_size: tuple[int, int]):
         now = pr.get_time()
 
-        for i in range(self.current_line-self.num_shown_lines, self.current_line + self.num_shown_lines):
+        for i in range(self.current_line-self.num_shown_lines,
+                       self.current_line+self.num_shown_lines):
             if not (0 <= i < len(self.lines)):
                 continue
 
@@ -201,9 +202,7 @@ class Lyrics:
             x = max(x, 0)
             y = max(y, 0)
 
-            # current line
             if i == self.current_line:
                 self.draw_current_line(x, y, now)
-            # other line
             else:
                 self.draw_other_line(x, y, i)
