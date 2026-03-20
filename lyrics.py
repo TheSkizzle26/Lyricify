@@ -157,7 +157,7 @@ class Lyrics:
             effect_offset_t = easings.ease_out_quart(effect_offset_t)
             final_size = self.font_size + effect_offset_t * 8
 
-            rotation_target = ((char_idx%2)*2-1) * 4# math.sin(char_x) * 5
+            rotation_target = ((char_idx%2)*2-1) * 4 # math.sin(char_x) * 5
             rotation = effect_offset_t * rotation_target
 
             # this took me ages to figure out
