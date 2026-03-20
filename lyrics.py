@@ -35,11 +35,10 @@ class Lyrics:
     def reset(self, song_pos: float):
         self.start_time = pr.get_time() - song_pos
 
-        line_idx = len(self.lines)-1 # last line
+        line_idx = 0
         for i, line in enumerate(self.lines):
-            if line.time > song_pos:
-                line_idx = i-1
-                break
+            if line.time < song_pos:
+                line_idx = i
 
         if line_idx < 0:
             line_idx = 0
