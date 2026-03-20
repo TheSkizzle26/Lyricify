@@ -16,6 +16,10 @@ class Lyrics:
             None,
             0
         )
+        pr.set_texture_filter(
+            self.font.texture,
+            pr.TextureFilter.TEXTURE_FILTER_TRILINEAR
+        )
 
         self.anchor_pos = (
             1920 // 10,
@@ -121,6 +125,8 @@ class Lyrics:
         )
 
     def draw_current_line(self, x: int, y: int, now: float):
+        # needs optimization
+
         line = self.lines[self.current_line]
 
         passed_time = (now - self.start_time) - line.time
@@ -132,6 +138,7 @@ class Lyrics:
         char_x = 0
         for char_idx in range(len(line.text)):
             char = line.text[char_idx]
+            char_width = self.get_str_width(char)
 
             lerp = (t_idx - char_idx) * 0.5 + 0.5
             lerp = self.clamp(lerp, 0, 1)
@@ -142,11 +149,21 @@ class Lyrics:
             )
             color = self.color_clamp(color)
 
-            pr.draw_text_ex(
+            effect_offset_t = self.clamp(1 - abs(t_idx - char_idx)/2 - 0.5, 0, 1)
+            effect_offset_t = easings.ease_out_quart(effect_offset_t)
+            final_size = self.font_size + effect_offset_t * 8
+
+            rotation_target = math.sin(char_x) * 7
+            rotation = effect_offset_t * rotation_target
+
+            # this took me ages to figure out
+            pr.draw_text_pro(
                 self.font,
                 char,
-                (x + char_x, y),
-                self.font_size,
+                (x + char_x + char_width/2+ char_width/2 , y + self.font_size/2),
+                (char_width * (final_size / self.font_size), final_size/2),
+                rotation,
+                final_size,
                 0,
                 (
                     color[0],
@@ -156,7 +173,7 @@ class Lyrics:
                 )
             )
 
-            char_x += self.get_str_width(char)
+            char_x += char_width
 
     def draw_other_line(self, x: int, y: int, i: int):
         line = self.lines[i]

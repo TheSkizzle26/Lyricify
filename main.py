@@ -45,8 +45,6 @@ class Main:
             self.load_data()
             self.sync()
 
-        print("current system:", self.system.get_song_pos())
-
         now = pr.get_time()
 
         if now - self.last_sync_time > 1:
