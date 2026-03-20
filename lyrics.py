@@ -29,8 +29,6 @@ class Lyrics:
         self.num_shown_lines = 5
         self.scroll = InterpolatedValue(0, 0.5)
 
-        # self.before_color = (160, 100, 80)
-        # self.after_color = (255, 255, 255)
         self.before_color = (255, 255, 255)
         self.after_color = (160, 100, 80)
 
