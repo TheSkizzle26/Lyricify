@@ -51,11 +51,11 @@ class Main:
             self.last_sync_time = now
             self.sync()
 
-        song_name = self.system.get_song_name()
+            song_name = self.system.get_song_name()
 
-        if song_name != self.current_song_name:
-            self.current_song_name = song_name
-            self.load_data()
+            if song_name != self.current_song_name:
+                self.current_song_name = song_name
+                self.load_data()
 
         self.lyrics.update()
 
