@@ -6,6 +6,7 @@ class Data(DataModule):
     def __init__(self):
         super().__init__()
 
+        # maybe I'll add more later, but for now this'll do
         self.lrclib = DataLrcLib()
 
     def fetch(self, name: str, album: str, artists: list[str], length: float):
