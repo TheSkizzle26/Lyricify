@@ -125,12 +125,12 @@ class Lyrics:
         )
 
     def draw_current_line(self, x: int, y: int, now: float):
-        # needs optimization
-
         line = self.lines[self.current_line]
-
         passed_time = (now - self.start_time) - line.time
-        total_duration = self.lines[min(self.current_line + 1, len(self.lines) - 1)].time - self.lines[self.current_line].time
+
+        next_line_idx = min(self.current_line + 1, len(self.lines) - 1)
+        next_line = self.lines[next_line_idx]
+        total_duration = next_line.time - line.time
 
         t = passed_time / (total_duration if total_duration else passed_time)
         t_idx = t * len(line.text)
@@ -149,7 +149,11 @@ class Lyrics:
             )
             color = self.color_clamp(color)
 
-            effect_offset_t = self.clamp(1 - abs(t_idx - char_idx)/2 - 0.5, 0, 1)
+            effect_offset_t = self.clamp(
+                1 - abs(t_idx - char_idx)/2 - 0.5,
+                0,
+                1
+            )
             effect_offset_t = easings.ease_out_quart(effect_offset_t)
             final_size = self.font_size + effect_offset_t * 8
 
@@ -160,8 +164,14 @@ class Lyrics:
             pr.draw_text_pro(
                 self.font,
                 char,
-                (x + char_x + char_width/2+ char_width/2 , y + self.font_size/2),
-                (char_width * (final_size / self.font_size), final_size/2),
+                (
+                    x + char_x + char_width/2+ char_width/2,
+                    y + self.font_size/2
+                ),
+                (
+                    char_width * (final_size / self.font_size),
+                    final_size/2
+                ),
                 rotation,
                 final_size,
                 0,
@@ -211,7 +221,9 @@ class Lyrics:
                     4
                 ) * 50
             )
-            y = self.anchor_pos[1] + int((i - self.scroll.get()) * self.font_size)
+            y = self.anchor_pos[1] + int(
+                (i - self.scroll.get()) * self.font_size
+            )
 
             x = max(x, 0)
             y = max(y, 0)
