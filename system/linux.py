@@ -8,6 +8,7 @@ class SystemLinux(System):
     def __init__(self):
         self.is_playing = False
         self.song_title = ""
+        self.song_album = ""
         self.song_artists = []
         self.song_length = 0
         self.song_position = 0
@@ -40,10 +41,12 @@ class SystemLinux(System):
         metadata = await props.call_get("org.mpris.MediaPlayer2.Player", "Metadata")
 
         title = metadata.value.get("xesam:title", None)
+        album = metadata.value.get("xesam:album", None)
         artists = metadata.value.get("xesam:artist", None)
         length = metadata.value.get("mpris:length", None)
 
         if title: self.song_title = title.value
+        if album: self.song_album = album.value
         if artists: self.song_artists = artists.value
         if length: self.song_length = length.value / 1_000_000
 
@@ -60,6 +63,18 @@ class SystemLinux(System):
     def get_song_name(self) -> str:
         asyncio.run(self.fetch_data())
         return self.song_title
+
+    def get_song_album(self) -> str:
+        asyncio.run(self.fetch_data())
+        return self.song_album
+
+    def get_song_artists(self) -> list[str]:
+        asyncio.run(self.fetch_data())
+        return self.song_artists
+
+    def get_song_length(self) -> float:
+        asyncio.run(self.fetch_data())
+        return self.song_length
 
     def get_song_pos(self) -> float:
         asyncio.run(self.fetch_data())

@@ -1,6 +1,7 @@
 import pyray as pr
 import sys
 
+import data
 import system
 from lyrics import Lyrics
 
@@ -16,13 +17,24 @@ class Main:
         pr.set_target_fps(144)
 
         self.system = system.SystemLinux()
-        self.lyrics = Lyrics("test_data")
+        self.data = data.Data()
+        self.lyrics = Lyrics()
+        self.current_song_name = None
 
         self.last_sync_time = -999
 
     def sync(self):
         pos = self.system.get_song_pos()
         self.lyrics.reset(pos)
+
+    def load_data(self):
+        self.data.fetch(
+            self.system.get_song_name(),
+            self.system.get_song_album(),
+            self.system.get_song_artists(),
+            self.system.get_song_length()
+        )
+        self.lyrics.load(self.data.get_lyrics_raw())
 
     def update(self):
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ESCAPE):
@@ -31,12 +43,15 @@ class Main:
 
         now = pr.get_time()
 
-        if now - self.last_sync_time > 1:
+        if now - self.last_sync_time > 0.1:
             self.last_sync_time = now
             self.sync()
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
-            self.sync()
+        song_name = self.system.get_song_name()
+
+        if song_name != self.current_song_name:
+            self.current_song_name = song_name
+            self.load_data()
 
         self.lyrics.update()
 

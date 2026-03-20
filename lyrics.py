@@ -8,7 +8,7 @@ from line import Line
 
 
 class Lyrics:
-    def __init__(self, path: str = None):
+    def __init__(self):
         self.font_size = 48
         self.font = pr.load_font_ex(
             "jetbrains_mono.ttf",
@@ -32,10 +32,6 @@ class Lyrics:
         self.before_color = (160, 100, 80)
         self.after_color = (255, 255, 255)
 
-        if path:
-            with open(path, "r") as file:
-                self.load(file.read())
-
     def reset(self, song_pos: float):
         self.start_time = pr.get_time() - song_pos
 
@@ -52,7 +48,7 @@ class Lyrics:
             self.set_current_line(line_idx)
 
     def load_metadata(self, data_type: str, value: Any):
-        print(data_type, value)
+        ...
 
     def load_line(self, line: str):
         if line.count("[") == 0 or line.count("]") == 0:
@@ -79,6 +75,8 @@ class Lyrics:
         ))
 
     def load(self, raw: str):
+        self.lines = []
+
         for line in raw.split("\n"):
             try:
                 self.load_line(line)
