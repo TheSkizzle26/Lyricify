@@ -43,7 +43,7 @@ class Main:
 
         now = pr.get_time()
 
-        if now - self.last_sync_time > 0.1:
+        if now - self.last_sync_time > 1:
             self.last_sync_time = now
             self.sync()
 

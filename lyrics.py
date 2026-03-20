@@ -134,7 +134,7 @@ class Lyrics:
         for char_idx in range(len(line.text)):
             char = line.text[char_idx]
 
-            lerp = (t_idx - char_idx) * 0.5
+            lerp = (t_idx - char_idx) * 0.5 + 0.5
             lerp = self.clamp(lerp, 0, 1)
             color = self.color_lerp(
                 self.after_color,
