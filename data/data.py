@@ -15,6 +15,7 @@ class Data(DataModule):
 
         if self.lrclib.was_successful():
             self.lyrics_raw = self.lrclib.get_lyrics_raw()
+            print(f"Successfully fetched song info: {name}")
             return
 
         print(f"Couldn't fetch song info: {name}")

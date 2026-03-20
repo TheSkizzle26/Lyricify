@@ -31,19 +31,15 @@ class DataLrcLib(DataModule):
         if album and "album" in params_to_pass: params["album_name"] = album
         if length and "length" in params_to_pass: params["duration"] = length
 
-        print(name, album, artists, length)
-
         result = requests.get(url, params=params)
         if result.status_code == 404:
             print("lrclib returned code", result.status_code)
             return
 
         data = result.json()
-        print(len(data))
 
         found = False
         for json in data:
-            print(json)
             if self.load(json):
                 found = True
                 break
