@@ -24,11 +24,13 @@ class Main:
         self.lyrics = Lyrics()
         self.current_song_name = None
 
-        self.last_sync_time = -999
+        self.load_data()
+        self.sync(instant=True)
+        self.last_sync_time = pr.get_time()
 
-    def sync(self):
+    def sync(self, instant=False):
         pos = self.system.get_song_pos()
-        self.lyrics.reset(pos)
+        self.lyrics.reset(pos, instant=instant)
 
     def load_data(self):
         name = self.system.get_song_name()

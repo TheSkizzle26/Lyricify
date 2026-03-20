@@ -36,7 +36,7 @@ class Lyrics:
         self.before_color = (255, 255, 255)
         self.after_color = (160, 100, 80)
 
-    def reset(self, song_pos: float):
+    def reset(self, song_pos: float, instant=False):
         self.start_time = pr.get_time() - song_pos
 
         line_idx = 0
@@ -48,7 +48,7 @@ class Lyrics:
             line_idx = 0
 
         if line_idx != self.current_line:
-            self.set_current_line(line_idx)
+            self.set_current_line(line_idx, instant=instant)
 
     def load_metadata(self, data_type: str, value: Any):
         ...
