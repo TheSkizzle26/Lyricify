@@ -41,6 +41,10 @@ class Main:
             pr.close_window()
             sys.exit()
 
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
+            self.load_data()
+            self.sync()
+
         now = pr.get_time()
 
         if now - self.last_sync_time > 1:
