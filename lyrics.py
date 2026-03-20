@@ -11,7 +11,7 @@ class Lyrics:
     def __init__(self):
         self.font_size = 48
         self.font = pr.load_font_ex(
-            "jetbrains_mono.ttf",
+            "fonts/jetbrains_mono.ttf",
             self.font_size,
             None,
             0
