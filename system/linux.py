@@ -5,11 +5,6 @@ from .system import System
 
 
 class SystemLinux(System):
-    """
-    Incredibly unoptimized.
-    Let's just fetch the data like 7 times in a row.
-    """
-
     def __init__(self):
         self.is_playing = False
         self.song_path = ""
@@ -19,9 +14,7 @@ class SystemLinux(System):
         self.song_length = 0
         self.song_position = 0
 
-        asyncio.run(self.fetch_data())
-
-    async def fetch_data(self):
+    async def fetch_async(self):
         bus = await MessageBus().connect()
 
         introspection = await bus.introspect("org.freedesktop.DBus", "/org/freedesktop/DBus")
@@ -64,30 +57,26 @@ class SystemLinux(System):
         position = await props.call_get("org.mpris.MediaPlayer2.Player", "Position")
         self.song_position = position.value / 1_000_000
 
+    def fetch(self):
+        asyncio.run(self.fetch_async())
+
     def is_song_playing(self) -> bool:
-        asyncio.run(self.fetch_data())
         return self.is_playing
 
     def get_song_path(self) -> str:
-        asyncio.run(self.fetch_data())
         return self.song_path
 
     def get_song_name(self) -> str:
-        asyncio.run(self.fetch_data())
         return self.song_title
 
     def get_song_album(self) -> str:
-        asyncio.run(self.fetch_data())
         return self.song_album
 
     def get_song_artists(self) -> list[str]:
-        asyncio.run(self.fetch_data())
         return self.song_artists
 
     def get_song_length(self) -> float:
-        asyncio.run(self.fetch_data())
         return self.song_length
 
     def get_song_pos(self) -> float:
-        asyncio.run(self.fetch_data())
         return self.song_position

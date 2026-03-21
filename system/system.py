@@ -1,4 +1,7 @@
 class System:
+    def fetch(self):
+        ...
+
     def is_song_playing(self) -> bool:
         ...
 

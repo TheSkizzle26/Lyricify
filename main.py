@@ -101,6 +101,8 @@ class Main:
         now = pr.get_time()
 
         if now - self.last_sync_time > 1:
+            self.system.fetch()
+
             self.last_sync_time = now
             self.sync()
 
