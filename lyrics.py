@@ -30,8 +30,8 @@ class Lyrics:
         )
 
         self.anchor_pos = (
-            1920 // 10,
-            1080 // 2
+            self.config["anchor_x"],
+            self.config["anchor_y"]
         )
 
         self.lines: list[Line] = []
@@ -233,7 +233,7 @@ class Lyrics:
                     4
                 ) * 50
             )
-            y = self.anchor_pos[1] + int(
+            y = (self.anchor_pos[1] - self.config_font_size/2) + int(
                 (i - self.scroll.get()) * self.config_font_size
             )
 

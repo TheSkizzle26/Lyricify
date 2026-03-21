@@ -13,7 +13,7 @@ class ParamType:
 
 class Config:
     def __init__(self):
-        self.config_dir_path = platformdirs.user_data_dir(
+        self.config_dir_path = platformdirs.user_config_dir(
             APP_NAME,
             APP_AUTHOR
         )
@@ -25,6 +25,8 @@ class Config:
             "font_size": {"type": ParamType.NUMBER, "value": 48},
             "active_scale": {"type": ParamType.NUMBER, "value": 11},
             "active_rotation": {"type": ParamType.NUMBER, "value": 4},
+            "anchor_x": {"type": ParamType.NUMBER, "value": 192},
+            "anchor_y": {"type": ParamType.NUMBER, "value": 540}
         }
 
         if not os.path.exists(self.config_dir_path):
