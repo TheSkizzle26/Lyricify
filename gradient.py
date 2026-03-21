@@ -13,6 +13,11 @@ class Gradient:
             0, 0, 0,
             0.5, 0.3, 0.2
         ]
+        # self.colors = [
+        #     1, 0, 0,
+        #     0, 1, 0,
+        #     0, 0, 1
+        # ]
 
         value = pr.ffi.new("float[]", self.colors)
         pr.set_shader_value_v(

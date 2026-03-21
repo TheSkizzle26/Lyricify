@@ -130,7 +130,7 @@ void main() {
     float t = noise(vec3(uv.xy*2.0, time*0.2));
     t = (sin((t - 0.5) * 3.14159) + 1.0) * 0.5;
 
-    float scaled = clamp(t, 0.0, 0.9999) * float(numColors - 1);
+    float scaled = t * float(numColors - 1);
 
     int a_idx = int(scaled);
     int b_idx = a_idx + 1;
@@ -138,11 +138,10 @@ void main() {
     float sub_t = scaled - floor(scaled);
     sub_t = smoothstep(0, 1, sub_t);
 
-    vec3 a = LRGBtoOKLAB(colors[a_idx]);
-    vec3 b = LRGBtoOKLAB(colors[b_idx]);
+    vec3 a = colors[a_idx];
+    vec3 b = colors[b_idx];
 
     vec3 mixed = mix(a, b, sub_t);
-    vec3 color = OKLABtoLRGB(mixed);
 
-    f_color = vec4(color, 1);
+    f_color = vec4(mixed, 1);
 }
