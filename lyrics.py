@@ -3,19 +3,24 @@ import pyray as pr
 import math
 
 import easings
+from config import Config
 from i_value import InterpolatedValue
 from line import Line
 from palette import Palette
 
 
 class Lyrics:
-    def __init__(self, palette: Palette):
+    def __init__(self, config: Config, palette: Palette):
+        self.config = config
         self.palette = palette
 
-        self.font_size = 48
+        self.config_font_size = self.config["font_size"]
+        self.config_active_scale = self.config["active_scale"]
+        self.config_active_rotation = self.config["active_rotation"]
+
         self.font = pr.load_font_ex(
             "fonts/jetbrains_mono.ttf",
-            self.font_size,
+            self.config_font_size,
             None,
             0
         )
@@ -33,7 +38,7 @@ class Lyrics:
         self.current_line = 0
         self.start_time = pr.get_time()
 
-        self.num_shown_lines = 5
+        self.num_shown_lines = self.config["num_lines"]
         self.scroll = InterpolatedValue(0, 0.5)
 
     def reset(self, song_pos: float, instant=False):
@@ -101,7 +106,7 @@ class Lyrics:
         return int(pr.measure_text_ex(
             self.font,
             text,
-            font_size if font_size else self.font_size,
+            font_size if font_size else self.config_font_size,
             0
         ).x)
 
@@ -171,15 +176,15 @@ class Lyrics:
                 1
             )
             effect_offset_t = easings.ease_out_quart(effect_offset_t)
-            final_size = self.font_size + effect_offset_t * 11
+            final_size = self.config_font_size + effect_offset_t * self.config_active_scale
 
-            rotation_target = math.sin(char_idx*2 + pr.get_time()*7) * 4
+            rotation_target = math.sin(char_idx*2 + pr.get_time()*7) * self.config_active_rotation
             rotation = effect_offset_t * rotation_target
 
             self.draw_text_centered(
                 char,
-                x + char_x + char_width/2,
-                y + self.font_size/2,
+                x + char_x + char_width / 2,
+                y + self.config_font_size / 2,
                 final_size,
                 rotation,
                 (
@@ -204,7 +209,7 @@ class Lyrics:
             self.font,
             line.text,
             (x, y),
-            self.font_size,
+            self.config_font_size,
             0,
             (
                 color[0],
@@ -229,7 +234,7 @@ class Lyrics:
                 ) * 50
             )
             y = self.anchor_pos[1] + int(
-                (i - self.scroll.get()) * self.font_size
+                (i - self.scroll.get()) * self.config_font_size
             )
 
             x = max(x, 0)

@@ -1,12 +1,14 @@
 import platformdirs
 import os
 
+from defaults import *
+
 
 class Cache:
     def __init__(self):
         self.cache_path = platformdirs.user_cache_dir(
-            "Lyricify",
-            "TheSkizzle"
+            APP_NAME,
+            APP_AUTHOR
         )
 
         if not os.path.exists(self.cache_path):

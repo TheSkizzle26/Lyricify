@@ -7,6 +7,7 @@ import cover
 import data
 import system
 from cache import Cache
+from config import Config
 from gradient import Gradient
 from hash import get_song_hash
 from lyrics import Lyrics
@@ -25,10 +26,11 @@ class Main:
 
         self.system = system.SystemLinux()
         self.cache = Cache()
+        self.config = Config()
         self.data = data.Data()
         self.palette = Palette()
         self.gradient = Gradient(self.palette, (self.width, self.height))
-        self.lyrics = Lyrics(self.palette)
+        self.lyrics = Lyrics(self.config, self.palette)
         self.current_song_name = None
 
         self.gradient_texture = pr.load_render_texture(self.width, self.height)
