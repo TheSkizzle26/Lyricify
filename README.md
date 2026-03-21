@@ -1,7 +1,7 @@
 ## Lyricify
 A simple program to display the currently playing lyrics!
 
-![image](./image.png)
+![preview](./preview.gif)
 
 ## Requirements
 - Linux (Windows currently isn't supported)
