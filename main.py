@@ -1,14 +1,16 @@
 import os
-
 import pyray as pr
 import sys
+import pathlib
 
+import cover
 import data
 import system
 from cache import Cache
 from gradient import Gradient
 from hash import get_song_hash
 from lyrics import Lyrics
+from palette import Palette
 
 
 class Main:
@@ -24,25 +26,30 @@ class Main:
         self.system = system.SystemLinux()
         self.cache = Cache()
         self.data = data.Data()
-        self.gradient = Gradient((self.width, self.height))
-        self.lyrics = Lyrics()
+        self.palette = Palette()
+        self.gradient = Gradient(self.palette, (self.width, self.height))
+        self.lyrics = Lyrics(self.palette)
         self.current_song_name = None
 
         self.gradient_texture = pr.load_render_texture(self.width, self.height)
-        self.precalc_gradient()
+        self.calculate_palette()
 
         self.load_data()
         self.sync(instant=True)
         self.last_sync_time = pr.get_time()
 
     def find_song_path(self, path: str, name: str):
-        for file in os.listdir(path):
-            full_path = f"{path}/{file}"
+        for sub_dir in os.listdir(path):
+            full_path = f"{path}/{sub_dir}"
 
             if os.path.isdir(full_path):
-                return self.find_song_path(full_path, name)
-            elif file.endswith((".mp3", ".wav", ".ogg", ".flac")):
-                ...
+                ret = self.find_song_path(full_path, name)
+                if len(ret): return ret
+            elif sub_dir.endswith((".mp3", ".wav", ".ogg", ".flac")):
+                if sub_dir.startswith(name):
+                    return full_path
+
+        return ""
 
     def sync(self, instant=False):
         pos = self.system.get_song_pos()
@@ -98,27 +105,64 @@ class Main:
                 self.current_song_name = song_name
                 self.load_data()
 
-            if self.system.get_song_path():
-                # path provided by player
-                ...
-            else:
-                # find the path
-                ...
+                if self.system.get_song_path():
+                    # path provided by player
+                    song_path = self.system.get_song_path()
+                else:
+                    # find the path (use config for this path later)
+                    song_path = self.find_song_path(str(pathlib.Path.home()) + "/Musik", song_name)
+
+                if song_path:
+                    print(f"Loading cover image of {song_name} ({song_path})...")
+                else:
+                    print(f"Couldn't locate file for {song_name}")
+
+                image_data = cover.extract_file_cover(song_path)
+
+                if image_data:
+                    self.calculate_palette(image_data)
+                else:
+                    print(f"Couldn't load cover for {song_name}")
 
         self.lyrics.update()
 
-    def precalc_gradient(self):
+    def calculate_palette(self, image_data=None):
+        if image_data:
+            self.palette.from_image_data(image_data)
+
         pr.begin_texture_mode(self.gradient_texture)
         self.gradient.render((self.width, self.height))
         pr.end_texture_mode()
 
+    def draw_palette(self):
+        pr.draw_rectangle(
+            0, 0,
+            100, 100,
+            self.palette.get_color(0)
+        )
+        pr.draw_rectangle(
+            100, 0,
+            100, 100,
+            self.palette.get_color(1)
+        )
+        pr.draw_rectangle(
+            200, 0,
+            100, 100,
+            self.palette.get_color(2)
+        )
+        pr.draw_rectangle(
+            0, 100,
+            100, 100,
+            self.palette.get_text_color_light()
+        )
+        pr.draw_rectangle(
+            100, 100,
+            100, 100,
+            self.palette.get_text_color_dark()
+        )
+
     def render(self):
         pr.begin_drawing()
-        # pr.clear_background((
-        #     255,
-        #     90,
-        #     70
-        # ))
 
         pr.draw_texture(
             self.gradient_texture.texture,

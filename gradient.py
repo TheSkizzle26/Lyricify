@@ -1,32 +1,15 @@
-from PIL import Image
-from materialyoucolor.quantize import QuantizeCelebi
-from materialyoucolor.score.score import Score
-import os
 import pyray as pr
+
+from palette import Palette
 
 
 class Gradient:
-    def __init__(self, screen_size: tuple[int, int]):
-        self.shader = pr.load_shader("", "shaders/gradient.frag")
-        self.colors = [
-            0.5, 0.4, 0,
-            0, 0, 0,
-            0.5, 0.3, 0.2
-        ]
-        # self.colors = [
-        #     1, 0, 0,
-        #     0, 1, 0,
-        #     0, 0, 1
-        # ]
+    def __init__(self, palette: Palette, screen_size: tuple[int, int]):
+        self.palette = palette
+        self.num_colors = 3
 
-        value = pr.ffi.new("float[]", self.colors)
-        pr.set_shader_value_v(
-            self.shader,
-            pr.get_shader_location(self.shader, "colors"),
-            value,
-            pr.ShaderUniformDataType.SHADER_UNIFORM_VEC3,
-            len(self.colors)
-        )
+        self.shader = pr.load_shader("", "shaders/gradient.frag")
+        self.upload_colors()
 
         # aspect ratio
         value = pr.ffi.new("float*", screen_size[0] / screen_size[1])
@@ -49,21 +32,24 @@ class Gradient:
             (0, 0, 1, 1)
         )
 
-    def from_image(self, path: str):
-        if not os.path.exists(path):
-            return
+    def upload_colors(self):
+        colors = []
+        for i in range(self.num_colors):
+            [colors.append(v) for v in self.palette.get_color_float(i)]
 
-        image = Image.open(path)
-        pixels = list(image.getdata())
-
-        result = QuantizeCelebi(pixels, 128)
-        colors = Score.score(result)
-
-        print(colors)
+        value = pr.ffi.new("float[]", colors)
+        pr.set_shader_value_v(
+            self.shader,
+            pr.get_shader_location(self.shader, "colors"),
+            value,
+            pr.ShaderUniformDataType.SHADER_UNIFORM_VEC3,
+            len(colors)
+        )
 
     def render(self, screen_size: tuple[int, int]):
         pr.begin_shader_mode(self.shader)
 
+        self.upload_colors()
         pr.draw_rectangle(
             0, 0,
             *screen_size,

@@ -6,6 +6,7 @@ requires-python = ">=3.13"
 dependencies = [
     "cprofilev==1.0.7",
     "dbus-next==0.2.3",
+    "eyed3==0.9.9",
     "materialyoucolor==3.0.2",
     "pillow==12.1.1",
     "platformdirs==4.9.4",

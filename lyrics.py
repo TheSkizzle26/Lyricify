@@ -5,10 +5,13 @@ import math
 import easings
 from i_value import InterpolatedValue
 from line import Line
+from palette import Palette
 
 
 class Lyrics:
-    def __init__(self):
+    def __init__(self, palette: Palette):
+        self.palette = palette
+
         self.font_size = 48
         self.font = pr.load_font_ex(
             "fonts/jetbrains_mono.ttf",
@@ -32,9 +35,6 @@ class Lyrics:
 
         self.num_shown_lines = 5
         self.scroll = InterpolatedValue(0, 0.5)
-
-        self.before_color = (255, 255, 255)
-        self.after_color = (160, 100, 80)
 
     def reset(self, song_pos: float, instant=False):
         self.start_time = pr.get_time() - song_pos
@@ -159,8 +159,8 @@ class Lyrics:
             lerp = (t_idx - char_idx) * 0.5 + 0.5
             lerp = self.clamp(lerp, 0, 1)
             color = self.color_lerp(
-                self.after_color,
-                self.before_color,
+                self.palette.get_text_color_dark(),
+                self.palette.get_text_color_light(),
                 lerp
             )
             color = self.color_clamp(color)
@@ -198,7 +198,7 @@ class Lyrics:
         alpha = 1 - (abs(i - self.scroll.get()) / self.num_shown_lines)
         alpha = easings.ease_out_quart(alpha)
         alpha = self.clamp(alpha, 0, 1)
-        color = self.before_color if (i - self.scroll.get()) < 0 else self.after_color
+        color = self.palette.get_text_color_light() if (i - self.scroll.get()) < 0 else self.palette.get_text_color_dark()
 
         pr.draw_text_ex(
             self.font,
