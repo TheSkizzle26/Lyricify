@@ -89,6 +89,8 @@ class Main:
             self.lyrics.load(self.data.get_lyrics_raw())
             self.cache.store(song_hash, self.data.get_lyrics_raw())
 
+        self.lyrics.reset(self.system.get_song_pos(), instant=True)
+
     def update(self):
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ESCAPE):
             pr.close_window()
