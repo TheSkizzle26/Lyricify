@@ -54,7 +54,10 @@ class Lyrics:
             line_idx = 0
 
         if line_idx != self.current_line:
-            self.set_current_line(line_idx, instant=instant)
+            self.set_current_line(
+                line_idx,
+                instant=(abs(line_idx - self.current_line) > 3) or instant
+            )
 
     def load_metadata(self, data_type: str, value: Any):
         ...
@@ -94,7 +97,7 @@ class Lyrics:
 
     def set_current_line(self, value: int, instant=False, start_at_current=True):
         self.current_line = value
-        self.scroll.set(value, instant, start_at_current)
+        self.scroll.set(value, instant=instant, start_at_current=start_at_current)
 
     def update(self):
         now = pr.get_time()
