@@ -126,15 +126,16 @@ float noise(vec3 p){
 
 void main() {
     vec2 uv = fragTexCoord * vec2(aspectRatio, 1.0);
+
     float t = noise(vec3(uv.xy*2.0, time*0.2));
     t = (sin((t - 0.5) * 3.14159) + 1.0) * 0.5;
 
-    float scaled = t * float(numColors - 1);
+    float scaled = clamp(t, 0.0, 0.9999) * float(numColors - 1);
 
-    int a_idx = int(floor(scaled));
-    int b_idx = min(a_idx+1, numColors-1);
+    int a_idx = int(scaled);
+    int b_idx = a_idx + 1;
 
-    float sub_t = fract(scaled);
+    float sub_t = scaled - floor(scaled);
     sub_t = smoothstep(0, 1, sub_t);
 
     vec3 a = LRGBtoOKLAB(colors[a_idx]);
