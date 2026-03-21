@@ -45,7 +45,6 @@ class Config:
         file = open(self.config_path, "w")
 
         file.write("// auto generated config\n")
-        file.write("// do not remove any of these values or the program WILL crash!\n")
 
         for param, data in self.params.items():
             file.write(f"{param} = {str(data["value"])}\n")
