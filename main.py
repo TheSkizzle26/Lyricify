@@ -4,6 +4,7 @@ import sys
 import data
 import system
 from cache import Cache
+from gradient import Gradient
 from hash import get_song_hash
 from lyrics import Lyrics
 
@@ -21,6 +22,7 @@ class Main:
         self.system = system.SystemLinux()
         self.cache = Cache()
         self.data = data.Data()
+        self.gradient = Gradient((self.width, self.height))
         self.lyrics = Lyrics()
         self.current_song_name = None
 
@@ -72,7 +74,7 @@ class Main:
 
         now = pr.get_time()
 
-        if now - self.last_sync_time > 0.5:
+        if now - self.last_sync_time > 1:
             self.last_sync_time = now
             self.sync()
 
@@ -86,11 +88,13 @@ class Main:
 
     def render(self):
         pr.begin_drawing()
-        pr.clear_background((
-            255,
-            90,
-            70
-        ))
+        # pr.clear_background((
+        #     255,
+        #     90,
+        #     70
+        # ))
+
+        self.gradient.render((self.width, self.height))
 
         self.lyrics.render(
             (self.width, self.height)

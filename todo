@@ -1,3 +1,4 @@
+- run sync in separate thread (prevent lag)
 - special rendering for empty line
 - gradient background
 - config file
