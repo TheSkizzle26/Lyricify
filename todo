@@ -1,4 +1,5 @@
 - run sync in separate thread (prevent lag)
+- only fetch system data once (change interface)
 - special rendering for empty line
 - gradient background
 - config file

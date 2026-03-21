@@ -2,6 +2,9 @@ class System:
     def is_song_playing(self) -> bool:
         ...
 
+    def get_song_path(self) -> str:
+        ...
+
     def get_song_name(self) -> str:
         ...
 

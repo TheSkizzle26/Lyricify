@@ -5,8 +5,14 @@ from .system import System
 
 
 class SystemLinux(System):
+    """
+    Incredibly unoptimized.
+    Let's just fetch the data like 7 times in a row.
+    """
+
     def __init__(self):
         self.is_playing = False
+        self.song_path = ""
         self.song_title = ""
         self.song_album = ""
         self.song_artists = []
@@ -40,11 +46,13 @@ class SystemLinux(System):
 
         metadata = await props.call_get("org.mpris.MediaPlayer2.Player", "Metadata")
 
+        path = metadata.value.get("xesam:location", None)
         title = metadata.value.get("xesam:title", None)
         album = metadata.value.get("xesam:album", None)
         artists = metadata.value.get("xesam:artist", None)
         length = metadata.value.get("mpris:length", None)
 
+        if path: self.song_path = path.value
         if title: self.song_title = title.value
         if album: self.song_album = album.value
         if artists: self.song_artists = artists.value
@@ -59,6 +67,10 @@ class SystemLinux(System):
     def is_song_playing(self) -> bool:
         asyncio.run(self.fetch_data())
         return self.is_playing
+
+    def get_song_path(self) -> str:
+        asyncio.run(self.fetch_data())
+        return self.song_path
 
     def get_song_name(self) -> str:
         asyncio.run(self.fetch_data())

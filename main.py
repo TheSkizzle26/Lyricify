@@ -1,3 +1,5 @@
+import os
+
 import pyray as pr
 import sys
 
@@ -33,8 +35,14 @@ class Main:
         self.sync(instant=True)
         self.last_sync_time = pr.get_time()
 
-    def find_song_path(self):
-        ...
+    def find_song_path(self, path: str, name: str):
+        for file in os.listdir(path):
+            full_path = f"{path}/{file}"
+
+            if os.path.isdir(full_path):
+                return self.find_song_path(full_path, name)
+            elif file.endswith((".mp3", ".wav", ".ogg", ".flac")):
+                ...
 
     def sync(self, instant=False):
         pos = self.system.get_song_pos()
@@ -89,6 +97,13 @@ class Main:
             if song_name != self.current_song_name:
                 self.current_song_name = song_name
                 self.load_data()
+
+            if self.system.get_song_path():
+                # path provided by player
+                ...
+            else:
+                # find the path
+                ...
 
         self.lyrics.update()
 

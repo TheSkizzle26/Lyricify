@@ -1,0 +1,3 @@
+def extract_file_cover(path: str):
+    if path.endswith(".mp3"):
+        ...
