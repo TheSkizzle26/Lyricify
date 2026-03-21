@@ -8,9 +8,9 @@ from materialyoucolor.hct import Hct
 
 class Palette:
     def __init__(self):
-        self.colors = [(0, 0, 0), (0, 0, 0), (0, 0, 0)]
-        self.text_color_light = (255, 255, 255)
-        self.text_color_dark = (0, 0, 0)
+        self.colors = [(56, 30, 60), (107, 89, 108), (200, 138, 151)]
+        self.text_color_light = (255, 239, 252)
+        self.text_color_dark = (209, 173, 212)
 
     @staticmethod
     def argb_to_rgb(argb):
