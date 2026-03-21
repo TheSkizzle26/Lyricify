@@ -97,11 +97,11 @@ class Lyrics:
             if (now - self.start_time) > self.lines[self.current_line+1].time:
                 self.set_current_line(self.current_line+1)
 
-    def get_str_width(self, text: str):
+    def get_str_width(self, text: str, font_size=None):
         return int(pr.measure_text_ex(
             self.font,
             text,
-            self.font_size,
+            font_size if font_size else self.font_size,
             0
         ).x)
 
@@ -122,6 +122,22 @@ class Lyrics:
             min(max(color[0], 0), 255),
             min(max(color[1], 0), 255),
             min(max(color[2], 0), 255),
+        )
+
+    def draw_text_centered(self, text: str, center_x: float, center_y: float, font_size: float, rotation: float, tint):
+        text_width = self.get_str_width(text)
+        pr.draw_text_pro(
+            self.font,
+            text,
+            (center_x, center_y),
+            (
+                text_width / 2,
+                font_size / 2
+            ),
+            rotation,
+            font_size,
+            0,
+            tint
         )
 
     def draw_current_line(self, x: int, y: int, now: float):
@@ -155,22 +171,44 @@ class Lyrics:
                 1
             )
             effect_offset_t = easings.ease_out_quart(effect_offset_t)
-            final_size = self.font_size + effect_offset_t * 8
+            final_size = self.font_size + effect_offset_t * 11
 
             # ((char_idx%2)*2-1) * 4
             rotation_target = math.sin(char_idx*2 + pr.get_time()*7) * 4
             rotation = effect_offset_t * rotation_target
 
             # this took me ages to figure out
+            # pr.draw_text_pro(
+            #     self.font,
+            #     char,
+            #     (
+            #         x + char_x + char_width/2,
+            #         y + self.font_size/2
+            #     ),
+            #     (
+            #         (char_width * ((final_size + effect_offset_t * 32) / self.font_size)) / 2,
+            #         (final_size + effect_offset_t * 32) / 2
+            #     ),
+            #     0,
+            #     final_size + effect_offset_t * 32,
+            #     0,
+            #     (
+            #         255,
+            #         255,
+            #         255,
+            #         128
+            #     )
+            # )
+
             pr.draw_text_pro(
                 self.font,
                 char,
                 (
-                    x + char_x + char_width/2+ char_width/2,
+                    x + char_x + char_width/2,
                     y + self.font_size/2
                 ),
                 (
-                    char_width * (final_size / self.font_size),
+                    (char_width * (final_size / self.font_size))/2,
                     final_size/2
                 ),
                 rotation,

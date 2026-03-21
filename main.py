@@ -17,7 +17,7 @@ class Main:
         )
         pr.init_window(self.width, self.height, "Lyricify")
         pr.set_window_monitor(0)
-        pr.set_target_fps(144)
+        pr.set_target_fps(60)
 
         self.system = system.SystemLinux()
         self.cache = Cache()
@@ -32,6 +32,9 @@ class Main:
         self.load_data()
         self.sync(instant=True)
         self.last_sync_time = pr.get_time()
+
+    def find_song_path(self):
+        ...
 
     def sync(self, instant=False):
         pos = self.system.get_song_pos()

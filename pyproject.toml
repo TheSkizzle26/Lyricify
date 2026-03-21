@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
+    "cprofilev==1.0.7",
     "dbus-next==0.2.3",
     "materialyoucolor==3.0.2",
     "pillow==12.1.1",
