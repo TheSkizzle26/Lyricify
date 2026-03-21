@@ -125,7 +125,7 @@ class Lyrics:
         )
 
     def draw_text_centered(self, text: str, center_x: float, center_y: float, font_size: float, rotation: float, tint):
-        text_width = self.get_str_width(text)
+        text_width = self.get_str_width(text, font_size)
         pr.draw_text_pro(
             self.font,
             text,
@@ -173,51 +173,19 @@ class Lyrics:
             effect_offset_t = easings.ease_out_quart(effect_offset_t)
             final_size = self.font_size + effect_offset_t * 11
 
-            # ((char_idx%2)*2-1) * 4
             rotation_target = math.sin(char_idx*2 + pr.get_time()*7) * 4
             rotation = effect_offset_t * rotation_target
 
-            # this took me ages to figure out
-            # pr.draw_text_pro(
-            #     self.font,
-            #     char,
-            #     (
-            #         x + char_x + char_width/2,
-            #         y + self.font_size/2
-            #     ),
-            #     (
-            #         (char_width * ((final_size + effect_offset_t * 32) / self.font_size)) / 2,
-            #         (final_size + effect_offset_t * 32) / 2
-            #     ),
-            #     0,
-            #     final_size + effect_offset_t * 32,
-            #     0,
-            #     (
-            #         255,
-            #         255,
-            #         255,
-            #         128
-            #     )
-            # )
-
-            pr.draw_text_pro(
-                self.font,
+            self.draw_text_centered(
                 char,
-                (
-                    x + char_x + char_width/2,
-                    y + self.font_size/2
-                ),
-                (
-                    (char_width * (final_size / self.font_size))/2,
-                    final_size/2
-                ),
-                rotation,
+                x + char_x + char_width/2,
+                y + self.font_size/2,
                 final_size,
-                0,
+                rotation,
                 (
-                    color[0],
-                    color[1],
-                    color[2],
+                    int(color[0]),
+                    int(color[1]),
+                    int(color[2]),
                     255
                 )
             )
