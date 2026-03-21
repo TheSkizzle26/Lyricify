@@ -63,6 +63,9 @@ class Main:
         album = self.system.get_song_album()
         length = self.system.get_song_length()
 
+        if not name or name == "":
+            return
+
         song_hash = get_song_hash(
             name,
             artists,
