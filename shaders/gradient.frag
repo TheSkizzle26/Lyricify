@@ -128,20 +128,22 @@ void main() {
     vec2 uv = fragTexCoord * vec2(aspectRatio, 1.0);
 
     float t = noise(vec3(uv.xy*2.0, time*0.2));
-    t = (sin((t - 0.5) * 3.14159) + 1.0) * 0.5;
+    // t = (sin((t - 0.5) * 3.14159) + 1.0) * 0.5;
+    t = smoothstep(0, 1, t);
 
     float scaled = t * float(numColors - 1);
 
     int a_idx = int(scaled);
     int b_idx = a_idx + 1;
 
-    float sub_t = scaled - floor(scaled);
+    float sub_t = fract(scaled);
     sub_t = smoothstep(0, 1, sub_t);
 
-    vec3 a = colors[a_idx];
-    vec3 b = colors[b_idx];
-
-    vec3 mixed = mix(a, b, sub_t);
+    vec3 mixed = mix(
+        colors[a_idx],
+        colors[b_idx],
+        sub_t
+    );
 
     f_color = vec4(mixed, 1);
 }
