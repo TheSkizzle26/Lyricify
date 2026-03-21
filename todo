@@ -1,3 +1,4 @@
 - run sync in separate thread (prevent lag)
 - special rendering for empty line
 - make gradient smoother and use dithering
+- make preview gif smaller
