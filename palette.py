@@ -54,6 +54,7 @@ class Palette:
             self.argb_to_rgb(scheme.tertiary_palette.tone(tones[2])),
         )
 
+        self.text_color_light = self.argb_to_rgb(scheme.primary_palette.tone(96))
         self.text_color_dark = self.argb_to_rgb(scheme.primary_palette.tone(75))
 
     def get_color(self, idx: int):
