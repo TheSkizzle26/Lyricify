@@ -91,6 +91,37 @@ class Main:
 
         self.sync(instant=True)
 
+    def sync_interval(self, now: float):
+        self.system.fetch()
+
+        self.last_sync_time = now
+        self.sync()
+
+        song_name = self.system.get_song_name()
+
+        if song_name != self.current_song_name:
+            self.current_song_name = song_name
+            self.load_data()
+
+            if self.system.get_song_path():
+                # path provided by player
+                song_path = self.system.get_song_path()
+            else:
+                # find the path
+                song_path = self.find_song_path(platformdirs.user_music_dir(), song_name)
+
+            if song_path:
+                print(f"Loading cover image of {song_name} ({song_path})...")
+            else:
+                print(f"Couldn't locate file for {song_name}")
+
+            image_data = cover.extract_file_cover(song_path)
+
+            if image_data:
+                self.calculate_palette(image_data)
+            else:
+                print(f"Couldn't load cover for {song_name}")
+
     def update(self):
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ESCAPE):
             pr.close_window()
@@ -103,35 +134,7 @@ class Main:
         now = pr.get_time()
 
         if now - self.last_sync_time > 1:
-            self.system.fetch()
-
-            self.last_sync_time = now
-            self.sync()
-
-            song_name = self.system.get_song_name()
-
-            if song_name != self.current_song_name:
-                self.current_song_name = song_name
-                self.load_data()
-
-                if self.system.get_song_path():
-                    # path provided by player
-                    song_path = self.system.get_song_path()
-                else:
-                    # find the path
-                    song_path = self.find_song_path(platformdirs.user_music_dir(), song_name)
-
-                if song_path:
-                    print(f"Loading cover image of {song_name} ({song_path})...")
-                else:
-                    print(f"Couldn't locate file for {song_name}")
-
-                image_data = cover.extract_file_cover(song_path)
-
-                if image_data:
-                    self.calculate_palette(image_data)
-                else:
-                    print(f"Couldn't load cover for {song_name}")
+            self.sync_interval(now)
 
         self.lyrics.update()
 
