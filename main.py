@@ -38,7 +38,7 @@ class Main:
 
         self.load_data()
         self.sync(instant=True)
-        self.last_sync_time = pr.get_time()
+        self.last_sync_time = -999
 
     def find_song_path(self, path: str, name: str):
         for sub_dir in os.listdir(path):
