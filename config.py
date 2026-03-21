@@ -94,8 +94,6 @@ class Config:
 
         file.close()
 
-        print(self.params)
-
     def __getitem__(self, item):
         if item in self.params:
             return self.params[item]["value"]
