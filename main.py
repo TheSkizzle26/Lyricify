@@ -1,7 +1,7 @@
 import os
 import pyray as pr
 import sys
-import pathlib
+import platformdirs
 
 import cover
 import data
