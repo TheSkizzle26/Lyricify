@@ -93,7 +93,6 @@ out vec4 f_color;
 const int numColors = 3;
 uniform vec3 colors[numColors];
 uniform float aspectRatio;
-uniform float time;
 
 
 // https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
@@ -127,8 +126,8 @@ float noise(vec3 p){
 void main() {
     vec2 uv = fragTexCoord * vec2(aspectRatio, 1.0);
 
-    float t = noise(vec3(uv.xy*2.0, time*0.2));
-    // t = (sin((t - 0.5) * 3.14159) + 1.0) * 0.5;
+    float t = noise(vec3(uv.xy * 0.5 + vec2(0, 0.1), 1));
+    t = (sin((t - 0.5) * 3.14159) + 1.0) * 0.5;
     t = smoothstep(0, 1, t);
 
     float scaled = t * float(numColors - 1);
@@ -140,10 +139,11 @@ void main() {
     sub_t = smoothstep(0, 1, sub_t);
 
     vec3 mixed = mix(
-        colors[a_idx],
-        colors[b_idx],
+        LRGBtoOKLAB(colors[a_idx]),
+        LRGBtoOKLAB(colors[b_idx]),
         sub_t
     );
+    vec3 color = OKLABtoLRGB(mixed);
 
-    f_color = vec4(mixed, 1);
+    f_color = vec4(color, 1);
 }

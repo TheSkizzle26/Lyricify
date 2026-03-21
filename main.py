@@ -26,6 +26,9 @@ class Main:
         self.lyrics = Lyrics()
         self.current_song_name = None
 
+        self.gradient_texture = pr.load_render_texture(self.width, self.height)
+        self.precalc_gradient()
+
         self.load_data()
         self.sync(instant=True)
         self.last_sync_time = pr.get_time()
@@ -86,6 +89,11 @@ class Main:
 
         self.lyrics.update()
 
+    def precalc_gradient(self):
+        pr.begin_texture_mode(self.gradient_texture)
+        self.gradient.render((self.width, self.height))
+        pr.end_texture_mode()
+
     def render(self):
         pr.begin_drawing()
         # pr.clear_background((
@@ -94,7 +102,11 @@ class Main:
         #     70
         # ))
 
-        self.gradient.render((self.width, self.height))
+        pr.draw_texture(
+            self.gradient_texture.texture,
+            0, 0,
+            pr.WHITE
+        )
 
         self.lyrics.render(
             (self.width, self.height)

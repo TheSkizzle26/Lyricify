@@ -64,15 +64,6 @@ class Gradient:
     def render(self, screen_size: tuple[int, int]):
         pr.begin_shader_mode(self.shader)
 
-        # time
-        value = pr.ffi.new("float*", pr.get_time())
-        pr.set_shader_value(
-            self.shader,
-            pr.get_shader_location(self.shader, "time"),
-            value,
-            pr.ShaderUniformDataType.SHADER_UNIFORM_FLOAT
-        )
-
         pr.draw_rectangle(
             0, 0,
             *screen_size,
