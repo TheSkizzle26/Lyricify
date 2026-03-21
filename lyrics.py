@@ -14,9 +14,11 @@ class Lyrics:
         self.config = config
         self.palette = palette
 
+        self.config_num_lines = self.config["num_lines"]
         self.config_font_size = self.config["font_size"]
         self.config_active_scale = self.config["active_scale"]
         self.config_active_rotation = self.config["active_rotation"]
+        self.config_max_offset = self.config["max_offset"]
 
         self.font = pr.load_font_ex(
             "fonts/jetbrains_mono.ttf",
@@ -38,7 +40,6 @@ class Lyrics:
         self.current_line = 0
         self.start_time = pr.get_time()
 
-        self.num_shown_lines = self.config["num_lines"]
         self.scroll = InterpolatedValue(0, 0.5)
 
     def reset(self, song_pos: float, instant=False):
@@ -200,7 +201,7 @@ class Lyrics:
     def draw_other_line(self, x: int, y: int, i: int):
         line = self.lines[i]
 
-        alpha = 1 - (abs(i - self.scroll.get()) / self.num_shown_lines)
+        alpha = 1 - (abs(i - self.scroll.get()) / self.config_num_lines)
         alpha = easings.ease_out_quart(alpha)
         alpha = self.clamp(alpha, 0, 1)
         color = self.palette.get_text_color_light() if (i - self.scroll.get()) < 0 else self.palette.get_text_color_dark()
@@ -222,16 +223,16 @@ class Lyrics:
     def render(self, screen_size: tuple[int, int]):
         now = pr.get_time()
 
-        for i in range(self.current_line-self.num_shown_lines,
-                       self.current_line+self.num_shown_lines):
+        for i in range(self.current_line-self.config_num_lines,
+                       self.current_line+self.config_num_lines):
             if not (0 <= i < len(self.lines)):
                 continue
 
             x = self.anchor_pos[0] + int(
                 math.pow(
-                    abs(i - self.scroll.get()) / self.num_shown_lines,
+                    abs(i - self.scroll.get()) / self.config_num_lines,
                     4
-                ) * 50
+                ) * self.config_max_offset
             )
             y = (self.anchor_pos[1] - self.config_font_size/2) + int(
                 (i - self.scroll.get()) * self.config_font_size
