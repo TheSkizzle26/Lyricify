@@ -2,3 +2,4 @@
 - special rendering for empty line
 - make gradient smoother and use dithering
 - make preview gif smaller
+- cache palettes
