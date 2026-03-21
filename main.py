@@ -109,8 +109,8 @@ class Main:
                     # path provided by player
                     song_path = self.system.get_song_path()
                 else:
-                    # find the path (use config for this path later)
-                    song_path = self.find_song_path(str(pathlib.Path.home()) + "/Musik", song_name)
+                    # find the path
+                    song_path = self.find_song_path(platformdirs.user_music_dir(), song_name)
 
                 if song_path:
                     print(f"Loading cover image of {song_name} ({song_path})...")
