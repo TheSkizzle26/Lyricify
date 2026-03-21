@@ -182,9 +182,7 @@ class Main:
             pr.WHITE
         )
 
-        self.lyrics.render(
-            (self.width, self.height)
-        )
+        self.lyrics.render()
 
         pr.end_drawing()
 

@@ -220,7 +220,7 @@ class Lyrics:
             )
         )
 
-    def render(self, screen_size: tuple[int, int]):
+    def render(self):
         now = pr.get_time()
 
         for i in range(self.current_line-self.config_num_lines,
