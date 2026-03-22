@@ -1,6 +1,7 @@
 #version 330 core
 
 /* OKLAB STUFF */
+// https://github.com/yum-food/HLSL_OKLAB
 
 vec3 saturate(vec3 v) {
     return clamp(v, 0, 1);
