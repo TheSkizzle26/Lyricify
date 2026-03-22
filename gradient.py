@@ -1,22 +1,38 @@
 import pyray as pr
 
+from config import Config
 from palette import Palette
 
 
 class Gradient:
-    def __init__(self, palette: Palette, screen_size: tuple[int, int]):
+    def __init__(self, config: Config, palette: Palette, screen_size: tuple[int, int]):
         self.palette = palette
         self.num_colors = 3
 
         self.shader = pr.load_shader("", "shaders/gradient.frag")
         self.upload_colors()
 
+        # screen_width
+        self.set_uniform(
+            "screenWidth",
+            screen_size[0],
+            "int*",
+            pr.ShaderUniformDataType.SHADER_UNIFORM_INT
+        )
+
         # aspect ratio
-        value = pr.ffi.new("float*", screen_size[0] / screen_size[1])
-        pr.set_shader_value(
-            self.shader,
-            pr.get_shader_location(self.shader, "aspectRatio"),
-            value,
+        self.set_uniform(
+            "aspectRatio",
+            screen_size[0] / screen_size[1],
+            "float*",
+            pr.ShaderUniformDataType.SHADER_UNIFORM_FLOAT
+        )
+
+        # noise amount
+        self.set_uniform(
+            "noiseAmount",
+            config["noise_amount"],
+            "float*",
             pr.ShaderUniformDataType.SHADER_UNIFORM_FLOAT
         )
 
@@ -30,6 +46,15 @@ class Gradient:
         pr.set_shapes_texture(
             texture,
             (0, 0, 1, 1)
+        )
+
+    def set_uniform(self, name: str, value, cdecl: str, uniform_type: int):
+        value = pr.ffi.new(cdecl, value)
+        pr.set_shader_value(
+            self.shader,
+            pr.get_shader_location(self.shader, name),
+            value,
+            uniform_type
         )
 
     def upload_colors(self):

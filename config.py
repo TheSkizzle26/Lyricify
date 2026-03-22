@@ -10,6 +10,7 @@ from defaults import *
 class ParamType:
     NUMBER = auto()
     NUMBER_3 = auto()
+    FLOAT = auto()
 
 class Config:
     def __init__(self):
@@ -27,7 +28,8 @@ class Config:
             "active_rotation": {"type": ParamType.NUMBER, "value": 4},
             "anchor_x": {"type": ParamType.NUMBER, "value": 192},
             "anchor_y": {"type": ParamType.NUMBER, "value": 540},
-            "max_offset": {"type": ParamType.NUMBER, "value": 50}
+            "max_offset": {"type": ParamType.NUMBER, "value": 50},
+            "noise_amount": {"type": ParamType.FLOAT, "value": 0.05},
         }
 
         if not os.path.exists(self.config_dir_path):
@@ -68,6 +70,8 @@ class Config:
                     raise BaseException(f"Error parsing config at line {line_idx}: Wrong number of values.")
 
                 self.params[param]["value"] = tuple(numbers)
+            case ParamType.FLOAT:
+                self.params[param]["value"] = float(value)
 
     def load(self):
         if not os.path.exists(self.config_path):

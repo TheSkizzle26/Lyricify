@@ -92,7 +92,9 @@ out vec4 f_color;
 
 const int numColors = 3;
 uniform vec3 colors[numColors];
+uniform uint screenWidth = 1920u;
 uniform float aspectRatio;
+uniform float noiseAmount;
 
 
 // https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
@@ -123,6 +125,20 @@ float noise(vec3 p){
     return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
+// https://stackoverflow.com/questions/23319289/is-there-a-good-glsl-hash-function
+uint triple32(uint x)
+{
+    x ^= x >> 17;
+    x *= 0xed5ad4bbU;
+    x ^= x >> 11;
+    x *= 0xac4c1b51U;
+    x ^= x >> 15;
+    x *= 0x31848babU;
+    x ^= x >> 14;
+    return x;
+}
+
+
 void main() {
     vec2 uv = fragTexCoord * vec2(aspectRatio, 1.0);
 
@@ -144,6 +160,12 @@ void main() {
         sub_t
     );
     vec3 color = OKLABtoLRGB(mixed);
+
+    // add white noise
+    uint white_noise = triple32(uint(gl_FragCoord.y) * uint(screenWidth) + uint(gl_FragCoord.x));
+    color += vec3(
+            float(white_noise) / pow(2.0, 32.0)
+    ) * noiseAmount;
 
     f_color = vec4(color, 1);
 }
