@@ -103,12 +103,19 @@ class Main:
             self.current_song_name = song_name
             self.load_data()
 
+            if not self.config["use_local_cover_palette"]:
+                return
+
             if self.system.get_song_path():
                 # path provided by player
                 song_path = self.system.get_song_path()
             else:
                 # find the path
-                song_path = self.find_song_path(platformdirs.user_music_dir(), song_name)
+                if self.config["music_file_path"]:
+                    search_path = self.config["music_file_path"].removesuffix("/").removesuffix("\\")
+                else:
+                    search_path = platformdirs.user_music_dir()
+                song_path = self.find_song_path(search_path, song_name)
 
             if song_path:
                 print(f"Loading cover image of {song_name} ({song_path})...")

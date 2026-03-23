@@ -1,18 +1,22 @@
 import os
-from asyncio.events import BaseDefaultEventLoopPolicy
-
 import platformdirs
 from enum import Enum, auto
 
 from defaults import *
 
 
-class ParamType:
+class ParamType(Enum):
+    EMPTY = auto()
     NUMBER = auto()
     NUMBER_3 = auto()
+    STRING = auto()
     FLOAT = auto()
 
 class Config:
+    """
+    Bit convoluted but who cares
+    """
+
     def __init__(self):
         self.config_dir_path = platformdirs.user_config_dir(
             APP_NAME,
@@ -22,14 +26,30 @@ class Config:
         self.config_path = self.config_dir_path + "/" + "lyricify.conf"
 
         self.params = {
+            "empty0": {"type": ParamType.EMPTY},
+
             "num_lines": {"type": ParamType.NUMBER, "value": 5},
             "font_size": {"type": ParamType.NUMBER, "value": 48},
+
+            "empty1": {"type": ParamType.EMPTY},
+
             "active_scale": {"type": ParamType.NUMBER, "value": 11},
             "active_rotation": {"type": ParamType.NUMBER, "value": 4},
+
+            "empty2": {"type": ParamType.EMPTY},
+
             "anchor_x": {"type": ParamType.NUMBER, "value": 192},
             "anchor_y": {"type": ParamType.NUMBER, "value": 540},
             "max_offset": {"type": ParamType.NUMBER, "value": 50},
+
+            "empty3": {"type": ParamType.EMPTY},
+
             "noise_amount": {"type": ParamType.FLOAT, "value": 0.05},
+
+            "empty4": {"type": ParamType.EMPTY},
+
+            "use_local_cover_palette": {"type": ParamType.NUMBER, "value": 0, "comment": "set to 1 to use local music files for palette"},
+            "music_file_path": {"type": ParamType.STRING, "value": "", "comment": "leave empty to use default Music directory"},
         }
 
         if not os.path.exists(self.config_dir_path):
@@ -50,26 +70,53 @@ class Config:
         file.write("// auto generated config\n")
 
         for param, data in self.params.items():
-            file.write(f"{param} = {str(data["value"])}\n")
+            if data["type"] == ParamType.EMPTY:
+                file.write("\n")
+                continue
+
+            if data["type"] == ParamType.STRING:
+                value = '"' + str(data["value"]) + '"'
+            else:
+                value = str(data["value"])
+
+            line = f"{param} = {value}"
+
+            if "comment" in data:
+                line += f" // {data["comment"]}"
+
+            file.write(line + "\n")
 
         file.close()
         print(f"Generated default config file at {self.config_path}")
 
+    def print_parse_error(self, line: int, comment: str):
+        raise BaseException(f"Error parsing config at line {line}: {comment}")
+
     def load_param(self, line_idx: int, param: str, value):
         if param not in self.params:
-            raise BaseException(f"Error parsing config at line {line_idx}: '{param}' doesn't exist.")
+            self.print_parse_error(line_idx, f"\"{param}\" doesn\'t exist.")
 
         match self.params[param]["type"]:
             case ParamType.NUMBER:
                 self.params[param]["value"] = int(value)
             case ParamType.NUMBER_3:
+                if not (value.count("(") == 1 and value.count(")") == 1):
+                    self.print_parse_error(line_idx, "Syntax error.")
+
                 value = value.lstrip("(").rstrip(")")
                 numbers = [int(v) for v in value.split(",")]
 
                 if len(numbers) != 3:
-                    raise BaseException(f"Error parsing config at line {line_idx}: Wrong number of values.")
+                    self.print_parse_error(line_idx, "Wrong number of values.")
 
                 self.params[param]["value"] = tuple(numbers)
+            case ParamType.STRING:
+                if value.count('"') != 2:
+                    self.print_parse_error(line_idx, "Syntax error.")
+
+                value = value.strip('"')
+
+                self.params[param]["value"] = value
             case ParamType.FLOAT:
                 self.params[param]["value"] = float(value)
 
