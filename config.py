@@ -50,6 +50,14 @@ class Config:
 
             "use_local_cover_palette": {"type": ParamType.NUMBER, "value": 0, "comment": "set to 1 to use local music files for palette"},
             "music_file_path": {"type": ParamType.STRING, "value": "", "comment": "leave empty to use default Music directory"},
+
+            "empty5": {"type": ParamType.EMPTY},
+
+            "bg_color1": {"type": ParamType.NUMBER_3, "value": (56, 30, 60)},
+            "bg_color2": {"type": ParamType.NUMBER_3, "value": (107, 89, 108)},
+            "bg_color3": {"type": ParamType.NUMBER_3, "value": (200, 138, 151)},
+            "text_color_dark": {"type": ParamType.NUMBER_3, "value": (209, 173, 212)},
+            "text_color_light": {"type": ParamType.NUMBER_3, "value": (255, 239, 252)},
         }
 
         if not os.path.exists(self.config_dir_path):

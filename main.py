@@ -28,7 +28,7 @@ class Main:
         self.cache = Cache()
         self.config = Config()
         self.data = data.Data()
-        self.palette = Palette()
+        self.palette = Palette(self.config)
         self.gradient = Gradient(self.config, self.palette, (self.width, self.height))
         self.lyrics = Lyrics(self.config, self.palette)
         self.current_song_name = None
