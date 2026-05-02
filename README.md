@@ -21,10 +21,6 @@ A simple program to display the currently playing lyrics!
 - **There's a black screen?**
 
     Just wait a few seconds, it probably can't find the lyrics online.
-- **The background is black?**
-    
-    Lyricify searches your music directory for a file containing the currently playing song.
-If it can't find it, it can't use the contained cover art. I will add fetching this information online later.
 - **The lyrics aren't synced up correctly?**
 
     Sometimes the lyrics this program fetches online are just poorly synced.
